@@ -15,20 +15,20 @@ pipeline {
         }
 
         stage('Setup Virtual Environment') {
-            steps {
-                sh '''
-                python3 -m venv $VENV_DIR
-                source $VENV_DIR/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
-            }
-        }
+    steps {
+        sh '''
+        python3 -m venv venv
+        . venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        '''
+    }
+}
 
         stage('Lint') {
             steps {
                 sh '''
-                source $VENV_DIR/bin/activate
+                . $VENV_DIR/bin/activate
                 flake8 $APP_ENTRY
                 '''
             }
@@ -37,7 +37,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                source $VENV_DIR/bin/activate
+                . $VENV_DIR/bin/activate
                 pytest
                 '''
             }
@@ -56,7 +56,7 @@ pipeline {
                 echo "Starting Flask app..."
                 cd $DEPLOY_DIR
                 python3 -m venv venv
-                source venv/bin/activate
+                . venv/bin/activate
                 pip install -r requirements.txt
                 nohup python3 $APP_ENTRY > app.log 2>&1 &
                 '''
