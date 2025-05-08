@@ -1,13 +1,10 @@
 pipeline {
     agent any
-
     environment {
         VENV_DIR = 'venv'
-        DEPLOY_DIR = '/home/ubuntu/flask-ci-cd-prod'
-        APP_ENTRY = 'app.py'
     }
-
     stages {
+HEAD
         stage('Checkout') {
             steps {
                 git 'https://github.com/shahwar890/flask-ci-cd.git'
@@ -74,5 +71,23 @@ pipeline {
         failure {
             echo 'Something went wrong during the pipeline.'
         }
+
+        stage('Setup') {
+            steps {
+                sh '''
+                python3 -m venv $VENV_DIR
+                . $VENV_DIR/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
+        stage('Test') {
+            steps {
+                sh '. venv/bin/activate && pytest test_app.py'
+            }
+        }
+4d84271 (Fix: replace source with dot)
     }
 }
+
